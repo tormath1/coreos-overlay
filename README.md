@@ -1,3 +1,11 @@
+# Experimental branch, do not use!
+
+## This branch is an experimental playground and not intended to be used by anyone.
+
+The branch is used for experiementing with the Flatcar SDK / build system, to
+test various aspects and to validate examples used in Flatcar's developer
+documentation.
+
 # Overview
 
 This overlay contains Container Linux specific packages and Gentoo packages
