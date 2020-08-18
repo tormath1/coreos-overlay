@@ -45,6 +45,7 @@ S="${WORKDIR}/linux-${PN}-${COMMIT_HASH}"
 src_prepare() {
 	default
 	touch ChangeLog || die
+	epatch "${FILESDIR}"/pam-1.4.0-locked-accounts.patch
 	eautoreconf
 }
 
