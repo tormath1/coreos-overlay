@@ -7,7 +7,7 @@
 
 EAPI=7
 
-inherit autotools db-use fcaps toolchain-funcs usr-ldscript multilib-minimal
+inherit autotools db-use fcaps toolchain-funcs multilib-minimal
 
 DESCRIPTION="Linux-PAM (Pluggable Authentication Modules)"
 HOMEPAGE="https://github.com/linux-pam/linux-pam"
@@ -82,6 +82,7 @@ multilib_src_configure() {
 		$(use_enable pie)
 		$(use_enable selinux)
 		--enable-isadir='.' #464016
+		--enable-sconfigdir="/usr/lib/pam/"
 		)
 	ECONF_SOURCE="${S}" econf "${myconf[@]}"
 }
@@ -93,8 +94,6 @@ multilib_src_compile() {
 multilib_src_install() {
 	emake DESTDIR="${D}" install \
 		sepermitlockdir="${EPREFIX}/run/sepermit"
-
-	gen_usr_ldscript -a pam pam_misc pamc
 }
 
 multilib_src_install_all() {
@@ -105,6 +104,8 @@ multilib_src_install_all() {
 
 	dodir /usr/lib/tmpfiles.d
 
+	rm "${D}/etc/environment"
+	cp "${FILESDIR}/tmpfiles.d/pam.conf" "${D}"/usr/lib/tmpfiles.d/${CATEGORY}-${PN}-config.conf
 	cat ->>  "${D}"/usr/lib/tmpfiles.d/${CATEGORY}-${PN}.conf <<-_EOF_
 		d /run/faillock 0755 root root
 	_EOF_
