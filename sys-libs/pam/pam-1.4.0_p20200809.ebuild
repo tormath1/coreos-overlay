@@ -1,6 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Flatcar: Based on pam-1.4.0_p20200809.ebuild from commit
+# 36a5458a6b5443e55ddbd03dab1bef792a109c98 in gentoo repo (see
+# https://gitweb.gentoo.org/repo/gentoo.git/plain/sys-libs/pam/pam-1.4.0_p20200809.ebuild?id=36a5458a6b5443e55ddbd03dab1bef792a109c98).
+
 EAPI=7
 
 inherit autotools db-use fcaps toolchain-funcs usr-ldscript multilib-minimal
