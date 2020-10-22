@@ -111,3 +111,7 @@ sys-kernel/coreos-firmware -savedconfig
 
 # Make kmod support kernel modules compressed via lzma(xz)
 sys-apps/kmod lzma
+
+# Work around some build failure, so disable sanitizers (we probably
+# don't use them anyway)
+sys-devel/gcc -sanitize
