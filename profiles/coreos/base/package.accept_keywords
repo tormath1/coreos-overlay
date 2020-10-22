@@ -88,3 +88,14 @@ dev-util/checkbashisms
 =sys-fs/cryptsetup-2.0.3 ~amd64
 
 =sys-libs/libseccomp-2.5.0 ~amd64 ~arm64
+
+# I'm not sure why this came up yet (krnowak)
+
+# required by =virtual/acl-0-r1 (argument)
+=virtual/acl-0-r1 **
+# required by =dev-libs/libverto-0.2.5-r1 (argument)
+=dev-libs/libverto-0.2.5-r1 ~arm64
+# required by =dev-libs/libev-4.15-r1 (argument)
+=dev-libs/libev-4.15-r1 ~arm64
+# required by =app-misc/pax-utils-1.1.6 (argument)
+=app-misc/pax-utils-1.1.6 ~arm64
