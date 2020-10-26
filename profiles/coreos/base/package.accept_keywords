@@ -47,11 +47,6 @@ dev-util/checkbashisms
 # https://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git/commit/?id=d6a4076b6ba6547d7e52c377a7c58c56eb5ea16e
 =sys-apps/iproute2-4.13.0 ~amd64 ~arm64
 
-# Upgrade to GCC 7.3 for retpoline support.
-=sys-devel/gcc-7.3.0
-=cross-aarch64-cros-linux-gnu/gcc-7.3.0 ~arm64
-=cross-x86_64-cros-linux-gnu/gcc-7.3.0 ~amd64
-
 # Force upgrades to work around catalyst problems while upgrading ncurses.
 =app-crypt/gnupg-2.2.20 ~amd64 ~arm64
 =sys-apps/gptfdisk-1.0.3 ~amd64 ~arm64
