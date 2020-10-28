@@ -108,3 +108,6 @@ sys-kernel/coreos-firmware -savedconfig
 
 # Make kmod support kernel modules compressed via lzma(xz)
 sys-apps/kmod lzma
+
+# These (qmanifest and qtegrity) are new tools and they pull even more dependencies.
+app-portage/portage-utils -qmanifest -qtegrity
