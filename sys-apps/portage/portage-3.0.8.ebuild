@@ -88,6 +88,12 @@ TARBALL_PV=${PV}
 SRC_URI="mirror://gentoo/${PN}-${TARBALL_PV}.tar.bz2
 	$(prefix_src_archives ${PN}-${TARBALL_PV}.tar.bz2)"
 
+PATCHES=(
+	"${FILESDIR}/0001-portage-repository-config.py-add-disabled-attribute-.patch"
+	"${FILESDIR}/0002-environment-Filter-EROOT-for-all-EAPIs.patch"
+	"${FILESDIR}/0003-depgraph-ensure-slot-rebuilds-happen-in-the-correct-.patch"
+)
+
 pkg_pretend() {
 	local CONFIG_CHECK="~IPC_NS ~PID_NS ~NET_NS ~UTS_NS"
 
@@ -98,9 +104,6 @@ python_prepare_all() {
 	distutils-r1_python_prepare_all
 
 	echo "# no defaults, configuration is in /etc" > cnf/repos.conf
-	epatch "${FILESDIR}/0001-portage-repository-config.py-add-disabled-attribute-.patch"
-	epatch "${FILESDIR}/0002-environment-Filter-EROOT-for-all-EAPIs.patch"
-	epatch "${FILESDIR}/0003-depgraph-ensure-slot-rebuilds-happen-in-the-correct-.patch"
 
 	sed -e "s:^VERSION = \"HEAD\"$:VERSION = \"${PV}\":" -i lib/portage/__init__.py || die
 
