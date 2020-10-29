@@ -1,2 +1,6 @@
 # Overwrite outdated portage-stable mask
 =dev-libs/openssl-1.1.1g
+
+# Override mask from portage-stable, it can be dropped when we finally update the packages.
+=sys-devel/binutils-2.32-r1
+=sys-libs/glibc-2.29-r2
