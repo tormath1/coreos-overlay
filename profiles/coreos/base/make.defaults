@@ -37,8 +37,7 @@ BOOTSTRAP_USE="${BOOTSTRAP_USE} curl"
 # Set SELinux policy
 POLICY_TYPES="targeted mcs mls"
 
-# Disable packages or optional features with distribution issues.
-ACCEPT_RESTRICT="* -bindist"
+# Enable bindist for both SDK and targets
 USE="${USE} bindist"
 
 # Default licenses that are accepted for ChromiumOS builds.
