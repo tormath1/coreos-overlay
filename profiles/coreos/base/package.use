@@ -111,3 +111,6 @@ sys-apps/kmod lzma
 
 # These (qmanifest and qtegrity) are new tools and they pull even more dependencies.
 app-portage/portage-utils -qmanifest -qtegrity
+
+# Don't move binaries from /usr/bin to /bin, it's the same location.
+sys-apps/coreutils -split-usr
