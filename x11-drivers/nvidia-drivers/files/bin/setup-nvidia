@@ -1,0 +1,96 @@
+. /usr/share/flatcar/release
+. /usr/share/flatcar/update.conf
+
+NVIDIA_DRIVER_VERSION=450.80.02
+NVIDIA_PRODUCT_TYPE=tesla
+NVIDIA_DOWNLOAD_BASEURL=https://us.download.nvidia.com/tesla/
+NVIDIA_DRIVER_BASENAME=NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}
+WORK_DIR='nvidia-workdir'
+DEVELOPER_CONTAINER="flatcar_developer_container.bin"
+
+function download_flatcar_developer_container() {
+  echo Downloading Flatcar Container Linux Developer Container for version ${FLATCAR_VERSION}
+
+  if [ ! -f ${DEVELOPER_CONTAINER} ]
+  then
+    FLATCAR_URL="https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/flatcar_developer_container.bin.bz2"
+    FLATCAR_URL="https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_developer_container.bin.bz2"
+    curl -L "${FLATCAR_URL}" -o ${DEVELOPER_CONTAINER}.bz2
+    bzip2 -d ${DEVELOPER_CONTAINER}.bz2
+  fi
+}
+
+function download_nvidia_driver_archive() {
+  echo Downloading NVIDIA ${NVIDIA_DRIVER_VERSION} Driver
+
+  if [ ! -f ${PWD}/${WORK_DIR}/${NVIDIA_DRIVER_BASENAME}.run ]
+  then
+    curl -v -L ${NVIDIA_DOWNLOAD_BASEURL}/${NVIDIA_DRIVER_VERSION}/${NVIDIA_DRIVER_BASENAME}.run -o ${PWD}/${WORK_DIR}/${NVIDIA_DRIVER_BASENAME}.run
+  fi
+}
+
+function extract_nvidia_installer() {
+  echo Extract the NVIDIA Driver Installer ${NVIDIA_DRIVER_VERSION}
+
+  pushd ${PWD}/${WORK_DIR}
+  chmod +x ${NVIDIA_DRIVER_BASENAME}.run
+  ./${NVIDIA_DRIVER_BASENAME}.run -x -s
+  popd
+}
+
+function run_nspawn_container() {
+  echo Spawn system-nspawn container to install the NVIDIA drivers
+
+  sudo systemd-nspawn --image=flatcar_developer_container.bin --bind=${PWD}/${WORK_DIR}:/nvidia --bind=/usr/share/oem/bin:/app/bin/ /app/bin/install-nvidia $NVIDIA_DRIVER_BASENAME
+}
+
+function create_lib_directories() {
+  mkdir -p /opt/lib64
+  mkdir -p /opt/bin
+  mkdir -p /opt/lib64/modules/$(uname -r)/video/
+}
+
+function copy_artifacts() {
+  BINARIES=(nvidia-debugdump nvidia-cuda-mps-control nvidia-xconfig nvidia-modprobe nvidia-smi nvidia-cuda-mps-server nvidia-persistenced nvidia-settings)
+  mv $WORK_DIR/${NVIDIA_DRIVER_BASENAME}/*.so.* /opt/lib64/
+  mv $WORK_DIR/${NVIDIA_DRIVER_BASENAME}/{nvidia-debugdump,nvidia-cuda-mps-control,nvidia-xconfig,nvidia-modprobe,nvidia-smi,nvidia-cuda-mps-server,nvidia-persistenced,nvidia-settings} /opt/bin/
+  mv $WORK_DIR/${NVIDIA_DRIVER_BASENAME}/kernel/*.ko /opt/lib64/modules/$(uname -r)/video/
+}
+
+function install_and_load() {
+  insmod /opt/lib64/modules/$(uname -r)/video/nvidia.ko
+  if [ ! -f /dev/nvidiactl ]
+  then
+    mknod -m 666 /dev/nvidiactl c 195 255
+  fi
+  if [ ! -f /dev/nvidia0 ]
+  then
+    mknod -m 666 /dev/nvidia0 c 195 0
+  fi
+  mkdir -p /etc/ld.so.conf.d/
+  echo "/opt/lib64" > /etc/ld.so.conf.d/nvidia.conf
+  ldconfig
+}
+
+function verify_installation() {
+  nvidia-smi
+  nvidia-modprobe -u -m -c 0
+}
+
+function presetup() {
+  mkdir -p ${PWD}/${WORK_DIR}
+}
+
+function setup() {
+  download_flatcar_developer_container
+  download_nvidia_driver_archive
+  extract_nvidia_installer
+  run_nspawn_container
+  create_lib_directories
+  copy_artifacts
+  install_and_load
+  verify_installation
+}
+
+presetup "$@"
+setup "$@"

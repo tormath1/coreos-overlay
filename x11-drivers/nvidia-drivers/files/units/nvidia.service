@@ -1,0 +1,12 @@
+[Unit]
+Description=NVIDIA Configure Service
+Requies=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=no
+ExecStart=/usr/share/oem/bin/setup-nvidia
+
+[Install]
+WantedBy=multi-user.target
