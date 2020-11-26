@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+
 . /usr/share/flatcar/release
 . /usr/share/flatcar/update.conf
 
@@ -25,8 +26,12 @@ function download_flatcar_developer_container() {
     if [[ "$GROUP" == "developer" ]]
     then
       FLATCAR_DEVELOPER_CONTAINER_URL="https://storage.googleapis.com/flatcar-jenkins/developer/developer/boards/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
-    else
-      FLATCAR_DEVELOPER_CONTAINER_URL="https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
+    else if [[ "$(curl -I -s -o /dev/null -w "%{http_code}" "https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_DEVELOPER_CONTAINER}.bz2")" == 200 ]]
+      then
+        FLATCAR_DEVELOPER_CONTAINER_URL="https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
+      else
+        FLATCAR_DEVELOPER_CONTAINER_URL="https://storage.googleapis.com/flatcar-jenkins/${GROUP}/boards/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
+      fi
     fi
 
     if [ ! -n "${FLATCAR_DEVELOPER_CONTAINER_URL}" ]
@@ -110,7 +115,7 @@ function is_nvidia_installation_required() {
     return 1
   fi
 
-  if [[ ! -d "/opt/nvidia/${NVIDIA_FLATCAR_VERSION_PAIR}" ]]; then
+  if [[ -d "/opt/nvidia/${NVIDIA_FLATCAR_VERSION_PAIR}" ]]; then
     return 1
   fi
 }
@@ -130,7 +135,7 @@ function setup() {
   verify_installation
 }
 
-if ! is_nvidia_installation_required
+if is_nvidia_installation_required
 then
   presetup "$@"
   setup "$@"
